@@ -529,6 +529,7 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		# Galaxy loop
 		for j,(gfile,gspec) in enumerate(zip(gfiles,gspecs)):
 			gname=gfile[gfile.rfind("/")+1:]
+			Gal[j,:]=gname
 
 			# Redshift loop
 			for k in range(nzs):
