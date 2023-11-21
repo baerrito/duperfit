@@ -14,7 +14,7 @@ At present, Duperfit is only tested to work on Linux systems. Mac OS X and Windo
 
 ## Installation
 
-Installation is as simple as cloning the repository to your machine. You will also need to set up your OS environment by setting the variable `DFDIR` to your installation directory, e.g. `export DFDIR=/home/mbaer/duperfit` with bash on my machine. One may add this to their `.bashrc` file if they so desire.
+Installation is as simple as cloning the repository to your machine. You will also need to set up your OS environment by setting the variable `DFDIR` to your installation directory, e.g. `export DFDIR=/home/mbaer/duperfit` with bash on my machine. One may add such a line to their `.bashrc` file if they so desire.
 
 ## Execution
 
