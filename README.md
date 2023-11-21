@@ -42,7 +42,7 @@ The Class and script utilize the same input structure, as the script utilizes th
    - `"output_path"`: Directory for saving the output file
    - `"output_file"`: Name of the output file, defaults to `"object_file"` with the input extension replaced with `".dfo"`
  - `"fit_params"`: Adjusts fitting parameters
-   - `"use_exact_z"`: Set true to use `"z_min"` as an exact redshift
+   - `"use_exact_z"`: Set `true` to use `"z_min"` as an exact redshift
    - `"z_min"`: Minimum redshift
    - `"z_max"`: Maximum redshift
    - `"delta_z"`: Redshift grid size
@@ -53,7 +53,7 @@ The Class and script utilize the same input structure, as the script utilizes th
    - `"max_galaxy_scale"`: Upper bound for galaxy scaling
  - `"fit_weight"`: Handles the weights of the fit
    - `"weight_source"`: Source of weigths for fit  - recommend leaving at either `"incl"` (included) or `"uw"` (unweighted); `"tell"` still should be tested
-   - `"estimate_error"`: Set True to estimate flux uncertainties with an iterative B-spline fit
+   - `"estimate_error"`: Set `true` to estimate flux uncertainties with an iterative B-spline fit
  - `"sigma_clipping"`: Handles options for sigma-clipping of the input spectrum
    - `"sigma_clip"`: Set `true` to sigma-clip the signal (recommended)
    - `"sigma_source"`: Source of sigma; can either be the flux errors (`"incl"`) or calculated (`"calc"`)
