@@ -16,6 +16,8 @@ At present, Duperfit is only tested to work on Linux systems. Mac OS X and Windo
 
 Installation is as simple as cloning the repository to your machine. You will also need to set up your OS environment by setting the variable `DFDIR` to your installation directory, e.g. `export DFDIR=/home/mbaer/duperfit` with bash on my machine. One may add such a line to their `.bashrc` file if they so desire.
 
+The `picklejar` directory contains pickle files with all the templates for efficient processing -- i.e., all data is loaded in one object rather than loaded on each iteration. However, these files may or may not work correctly when pulled to your machine. If this occurs, run `tempsetup.py` to set up these files for running the program. The old files will be overwritten, and should work on your machine once this process completes. Note that this script can also be used to add new spectra to your template libraries relatively smoothly.
+
 ## Execution
 
 Duperfit can be run a couple of different ways; with the main function, with a GUI, with a Class, or with a provided script. The latter 3 options will run, but are not yet finished with development; expect major updates to come to those in the next year or so.
