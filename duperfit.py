@@ -192,8 +192,7 @@ def core_fit(z,ospec,tspec,gspec,minw,maxw,resolution,Avmin,Avmax,exactz=False,\
 			Trust Region Reflective or Dog-box... still deciding
 	****************************************************************************
 	Written by Michael Baer
-		-adapted from Superfit in IDL by Andy Howell, written to utilize numpy
-			structured arrays
+		-adapted from Superfit in IDL by Andy Howell
 	"""
 	objspec = np.copy(ospec)
 	sflag=0
@@ -413,9 +412,8 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		-`wsrc='calc'` may eventually be implemented; if so, recommended for
 			consistency (either B-spline iterative fit or SG filter)
 	****************************************************************************
-    Written by Michael Baer
-		-adapted from Superfit in IDL by Andy Howell, written to utilize numpy
-			structured arrays
+	Written by Michael Baer
+		-adapted from Superfit in IDL by Andy Howell
 	"""
 
 	# Check wavelength range
@@ -501,17 +499,17 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 	tbsf=np.zeros(len(tfiles))
 	tbgf=np.zeros(len(tfiles))
 
-    # Initializing arrays for minimization
-    S=np.zeros((len(gfiles),nzs))
-    Gal=np.zeros((len(gfiles),nzs),dtype='<U3')
-    redshift=np.zeros((len(gfiles),nzs))
-    cc=np.zeros((len(gfiles),nzs))
-    ff=np.zeros((len(gfiles),nzs))
-    Av=np.zeros((len(gfiles),nzs))
-    sfrac=np.zeros((len(gfiles),nzs))
-    gfrac=np.zeros((len(gfiles),nzs))
-    S[:,:]=np.inf
-    gfrac[:,:]=np.inf
+	# Initializing arrays for minimization
+	S=np.zeros((len(gfiles),nzs))
+	Gal=np.zeros((len(gfiles),nzs),dtype='<U3')
+	redshift=np.zeros((len(gfiles),nzs))
+	cc=np.zeros((len(gfiles),nzs))
+	ff=np.zeros((len(gfiles),nzs))
+	Av=np.zeros((len(gfiles),nzs))
+	sfrac=np.zeros((len(gfiles),nzs))
+	gfrac=np.zeros((len(gfiles),nzs))
+	S[:,:]=np.inf
+	gfrac[:,:]=np.inf
 
 	# Initialize a template list... this is also very important
 	thetemps=[]
@@ -540,23 +538,23 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 
 				# Set z
 				z=zmin+k*zstep
-                redshift[j,k]=z
+				redshift[j,k]=z
 
 				# Run the core function
 				S[j,k],popt,sfrac[j,k],gfrac[j,k]=core_fit(z,bospec,tspec,\
-                                  gspec,minw,maxw,resolution,Avmin,Avmax,\
-                                  exactz=exactz,sfractol=sfractol,Rv=Rv,\
-                                  tscale=tscale,gscale=gscale,silence=silence)
-                cc[j,k]=popt[0]
-                ff[j,k]=popt[1]
-                Av[j,k]=-2.5*popt[2]
+						    gspec,minw,maxw,resolution,Avmin,Avmax,\
+						    exactz=exactz,sfractol=sfractol,Rv=Rv,\
+						    tscale=tscale,gscale=gscale,silence=silence)
+				cc[j,k]=popt[0]
+				ff[j,k]=popt[1]
+				Av[j,k]=-2.5*popt[2]
 
 			# End of the redshift loop
 
 		#End of the galaxy loop
 
-        # Determine loci with minimum S
-        wmin=np.unravel_index(np.argmin(S),S.shape)
+		# Determine loci with minimum S
+		wmin=np.unravel_index(np.argmin(S),S.shape)
 		tbS[i]=S[wmin]
 		tbG[i]=Gal[wmin]
 		tbz[i]=redshift[wmin]
@@ -577,8 +575,8 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		print('\n',flush=True) # Line break after load bar so terminal output isn't uggo
 	# End of the loop
 
-    # Deallocate unneeded arrays
-    del S, Gal, redshift, cc, ff, Av, sfrac, gfrac
+	# Deallocate unneeded arrays
+	del S, Gal, redshift, cc, ff, Av, sfrac, gfrac
 
 	# We're done! ... Or are we?
 	thetemps=np.array(thetemps) # *Vsauce music*
@@ -588,7 +586,7 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 
 	# Output table
 	output = Table((thetemps[wsort],tbS[wsort],tbz[wsort],tbG[wsort],\
-			       tbAv[wsort],tba[wsort],tbb[wsort],tbsf[wsort],tbgf[wsort]),\
+			       tbAv[wsort],tbcc[wsort],tbff[wsort],tbsf[wsort],tbgf[wsort]),\
 			      names=('SN','S','z','gal','Av','cSN','cgal','sfrac','gfrac'),\
 			      dtype=('str','float','float','str','float','float','float',\
 				  		 'float','float'))
