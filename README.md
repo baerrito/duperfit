@@ -41,6 +41,16 @@ The Class and script utilize the same input structure, as the script utilizes th
    - `"user_gal_template"`: Full path to a user-provided ASCII file containing a galaxy template to evaluate (CURRENTLY UNTESTED)
    - `"output_path"`: Directory for saving the output file
    - `"output_file"`: Name of the output file, defaults to `"object_file"` with the input extension replaced with `".dfo"`
+ - `"fit_params"`: Adjusts fitting parameters
+   - `"use_exact_z"`: Set true to use `"z_min"` as an exact redshift
+   - `"z_min"`: Minimum redshift
+   - `"z_max"`: Maximum redshift
+   - `"delta_z"`: Redshift grid size
+   - `"Av_min"`: Minimum A_V
+   - `"Av_max"`: Maximum A_V
+   - `"Rv"`: Relative extinction
+   - `"max_template_scale"`: Upper bound for SN scaling
+   - `"max_galaxy_scale"`: Upper bound for galaxy scaling
  - `"fit_weight"`: Handles the weights of the fit
    - `"weight_source"`: Source of weigths for fit  - recommend leaving at either `"incl"` (included) or `"uw"` (unweighted); `"tell"` still should be tested
    - `"estimate_error"`: Set True to estimate flux uncertainties with an iterative B-spline fit
