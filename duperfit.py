@@ -492,30 +492,14 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 	gspecs=galdict['gspecs']
 
 	# Initialize some arrays cuz that's cool
-	#S=np.zeros((len(tfiles),len(gfiles),nzs))
 	tbS=np.zeros(len(tfiles))
 	tbG=np.zeros(len(tfiles),dtype='<U3')
 	tbz=np.zeros(len(tfiles))
 	tbcc=np.zeros(len(tfiles))
 	tbff=np.zeros(len(tfiles))
 	tbAv=np.zeros(len(tfiles))
-	#tbae=np.zeros(len(tfiles))
-	#tbbe=np.zeros(len(tfiles)) ## Pay no attention to the parameter errors behind the curtain
-	#tbAve=np.zeros(len(tfiles))
 	tbsf=np.zeros(len(tfiles))
 	tbgf=np.zeros(len(tfiles))
-
-	# Initialize some values so Python doesn't scream at me
-	#bestzfort=0.
-	#bestG=0
-	#bestGa=0.
-	#bestGb=0.
-	#bestGAv=0.
-	##bGaerr=0.
-	##bGberr=0.
-	##bGAverr=0.
-	#bGsfrac=0.
-	#bGgfrac=0.
 
     # Initializing arrays for minimization
     S=np.zeros((len(gfiles),nzs))
@@ -524,9 +508,6 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
     cc=np.zeros((len(gfiles),nzs))
     ff=np.zeros((len(gfiles),nzs))
     Av=np.zeros((len(gfiles),nzs))
-    #ccerr=np.zeros((len(gfiles),nzs))
-    #fferr=np.zeros((len(gfiles),nzs))
-    #Averr=np.zeros((len(gfiles),nzs))
     sfrac=np.zeros((len(gfiles),nzs))
     gfrac=np.zeros((len(gfiles),nzs))
     S[:,:]=np.inf
@@ -550,12 +531,6 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		# Galaxy loop
 		for j,(gfile,gspec) in enumerate(zip(gfiles,gspecs)):
 			gname=gfile[gfile.rfind("/")+1:]
-			#if j==0:
-			#	bestGS=np.inf
-			#	bestGa=0.
-			#	bestGb=0.
-			#	bestGAv=0.
-			#	bGgfrac=np.inf
 
 			# Redshift loop
 			for k in range(nzs):
@@ -588,9 +563,6 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		tbcc[i]=cc[wmin]
 		tbff[i]=ff[wmin]
 		tbAv[i]=Av[wmin]
-		#tbae[i]=bGaerr
-		#tbbe[i]=bGberr
-		#tbAve[i]=bGAverr
 		tbsf[i]=sfrac[wmin]
 		tbgf[i]=gfrac[wmin]
 
@@ -614,17 +586,7 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 	# Sorting by increasing S (better to worse fits)
 	wsort=np.argsort(tbS)
 
-	# This output table never happened
-	#inds=np.arange(np.size(wsort))
-	#output = table.Table((inds,thetemps[wsort],tbG[wsort],tbS[wsort],tbz[wsort],\
-	#                      tba[wsort],tbae[wsort],tbb[wsort],tbbe[wsort],tbAv[wsort],\
-	#                      tbAve[wsort],tbsf[wsort]),
-	#                     names=('I','SN','gal','S','z','cSN','cSNerr','cgal','cgalerr',\
-	#                            'Av','Averr','sfrac'),
-	#                     dtype=('int','str','str','float','float','float','float','float','float',\
-	#                            'float','float','float'))
-
-	# This output table actually happened
+	# Output table
 	output = Table((thetemps[wsort],tbS[wsort],tbz[wsort],tbG[wsort],\
 			       tbAv[wsort],tba[wsort],tbb[wsort],tbsf[wsort],tbgf[wsort]),\
 			      names=('SN','S','z','gal','Av','cSN','cgal','sfrac','gfrac'),\
