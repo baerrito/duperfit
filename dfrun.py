@@ -11,6 +11,13 @@
 import os
 import sys
 import json
+
+# Custom packages (using environment variable so this script can be used anywhere)
+try:
+    dfdir=os.environ['DFDIR']
+except KeyError:
+    raise Exception("$DFDIR not recognized")
+sys.path.append(dfdir)
 from dfclass import Duperfit
 
 #####################################################################
