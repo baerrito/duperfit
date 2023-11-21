@@ -66,8 +66,8 @@ The Class and script utilize the same input structure, as the script utilizes th
    - `"min_wavelength"`: Minimum wavelength for fitting in Angstroms
    - `"max_wavelength"`: Maximum wavelength for fitting in Angstroms
    - `"wavelength_bin"`: Wavelength bin window width in Angstroms
-   - `"minimum_wavelength_fraction"`: Minimum fractional wavelength coverage for fitting F, where 0 < F <= 1
+   - `"minimum_wavelength_fraction"`: Minimum fractional wavelength coverage for fitting F, where 0 < F <= 1 (>=0.7 recommended)
  - `"options"`: Additional options
-   - `"silence_messages"`: Set `true` to silence warning messages during run
+   - `"silence_messages"`: Set `true` to silence warning messages during run (setting `false` is primarily for debugging)
    - `"save_output"`: Set `true` to save the output file
-   - `"optimizer`": Choice of optimization algorithm, recommended to use L-BFGS-B
+   - `"optimizer`": Choice of optimization algorithm, recommended to use L-BFGS-B, as my tests have shown it to return the same output as TRF in shorter time. This option may get updated or removed in future versions.
