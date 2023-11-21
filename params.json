@@ -1,0 +1,51 @@
+{
+  "IO" :
+  {
+    "object_dir" : "",
+    "object_file" : "SN2023uta_2023-10-12_19-58-25_Other_Other_TNS.dat",
+    "SN_templates" : "All SNe",
+    "user_SN_template" : "",
+    "gal_templates" : ["Sc"],
+    "user_gal_template" : "",
+    "output_path" : "./",
+    "output_file" : ""
+  },
+  "fit_params" :
+  {
+    "use_exact_z" : true,
+    "z_min" : 0.036812,
+    "z_max" : 0.05,
+    "delta_z" : 0.001,
+    "Av_min" : -2.0,
+    "Av_max" : 2.0,
+    "Rv" : 3.1,
+    "max_template_scale" : 3.0,
+    "max_galaxy_scale" : 3.0
+  },
+  "fit_weight" :
+  {
+    "weight_source" : "tell",
+    "estimate_error" : true
+  },
+  "sigma_clipping" :
+  {
+    "sigma_clip" : true,
+    "sigma_source" : "calc",
+    "n_iterations" : 5,
+    "n_grow" : 0,
+    "n_sigma" : 2.7
+  },
+  "wavelength_range" :
+  {
+    "min_wavelength" : 2000.0,
+    "max_wavelength" : 10000.0,
+    "wavelength_bin" : 20.0,
+    "minimum_wavelength_fraction" : 0.95
+  },
+  "options" :
+  {
+    "silence_messages" : true,
+    "save_output" : true,
+    "optimizer" : "L-BFGS-B"
+  }
+}
