@@ -6,4 +6,7 @@ authors:
     orcid: https://orcid.org/0009-0004-3209-685X
 title: "Duperfit"
 version: 0.1.0
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.10992738
 date-released: 2023-11-21
