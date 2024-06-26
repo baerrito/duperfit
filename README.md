@@ -1,4 +1,4 @@
-# Duperfit (Duplicated Superfit in Python) version 0.1
+# Duperfit (Duplicated Superfit in Python) version 0.1.1
 
 Spectral classification software, adapting Superfit by Dr. D. Andrew Howell into Python, implementing Python's object-oriented capabilities with aims for a more generally accessible user experience. Utilizes least-squares objective fitting of supernova templates plus galaxy flux and relative reddening via a Cardelli law.
 
