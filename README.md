@@ -54,7 +54,7 @@ The Class and script utilize the same input structure, as the script utilizes th
    - `"max_template_scale"`: Upper bound for SN scaling
    - `"max_galaxy_scale"`: Upper bound for galaxy scaling
  - `"fit_weight"`: Handles the weights of the fit
-   - `"weight_source"`: Source of weigths for fit  - recommend leaving at either `"incl"` (included) or `"uw"` (unweighted); `"tell"` still should be tested
+   - `"weight_source"`: Source of weights for fit  - `"incl"` (included); `"uw"` (unweighted); `"tell"` (telluric deweighted from `no77.weight`); or an explicit path to a user-provided weight file
    - `"estimate_error"`: Set `true` to estimate flux uncertainties with an iterative B-spline fit
  - `"sigma_clipping"`: Handles options for sigma-clipping of the input spectrum
    - `"sigma_clip"`: Set `true` to sigma-clip the signal (recommended)
