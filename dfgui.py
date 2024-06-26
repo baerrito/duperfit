@@ -12,9 +12,10 @@ from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import ttk
 # Custom packages
-from spec_handling import read_spec
-from temp_handling import *
-from duperfit import duperfit
+#from spec_handling import read_spec
+#from temp_handling import *
+#from duperfit import duperfit
+from dfclass import Duperfit
 # Plotting
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
@@ -475,11 +476,11 @@ def runfunc():
     weightpick=weightRbtn.varstate()
     wsrc=getrbtval(weightpick,["none","tell","incl","usr"],"incl")
     if wsrc=="usr":
-        uinpwgt=weightRbtn.browser.filename
-        if uinpwgt=="":
+        wsrc=weightRbtn.browser.filename
+        if wsrc=="":
             messagebox.showerror('I/O Error','Provide a weight file')
             ioe=1
-        elif not os.path.isfile(uinpwgt):
+        elif not os.path.isfile(wsrc):
             messagebox.showerror('I/O Error','User-provided weight file not found')
             ioe=2
     # Scale parameter limits
@@ -487,66 +488,57 @@ def runfunc():
     gscale=DscaleSlide.varstate()
     if ioe==0:
         root.destroy()
-        # Header
-        print("*"*60)
-        print("*"*3+" "*23+"DUPERFIT"+" "*23+"*"*3)
-        print("*"*3+" "*11+"(Duplicated Superfit in Python)"+" "*12+"*"*3)
-        print("*"*60)
-        print("*"+" "*58+"*")
-        print("*"+" "*4+"Written by Michael J. Baer"+" "*28+"*")
-        print("*"+" "*4+"Adapted from Superfit by D. Andrew Howell"+" "*13+"*")
-        print("*"+" "*58+"*")
-        print("*"+" "*4+"When using this program, please cite:"+" "*17+"*")
-        print("*"+" "*9+"D.A. Howell et al (2005), ApJ, 634, 1190"+" "*9+"*")
-        print("*"+" "*9+"M.J. Baer (in Preparation)"+" "*23+"*")
-        print("*"+" "*58+"*")
-        print("*"*60)
-        #time.sleep(1)
-        # Parameters
-        print()
-        print(" "*3+"PARAMETERS:")
-        print()
-        print(" "*6+f"Begin wavelength: {beginw:.1f} Angstrom")
-        print(" "*6+f"End wavelength: {endw:.1f} Angstrom")
-        print(" "*6+f"Binning: {resolution:.1f} Angstrom")
-        print(" "*6+f"Minimum template wavelength coverage: {sfractol*100:.0f}%")
-        print()
-        if exactz:
-            print(" "*6+f"Redshift: {zstart:.3f}")
-        else:
-            print(" "*6+f"zmin: {zstart:.3f}, zmax: {zstop:.3f}, dz: {zstep:.3f}")
-        print(" "*6+f"Avmin: {Avmin:.1f}, Avmax: {Avmax:.1f}, Rv: {Rv:.1f}")
-        print(" "*6+f"Maximum template scale: {tscale:.1f}")
-        print(" "*6+f"Maximum galaxy scale: {gscale:.1f}")
-        print()
-        print(" "*6+f"Sigma source: {sigsrc}")
-        print(" "*6+f"nsigma: {nsig}, grow: {grow}, niter: {niter}")
-        print(" "*6+f"Weight source: {wsrc}, Estimate error flux: {isest}")
-        print()
-        print(" "*6+f"Galaxies: {galpicks}")
-        print(" "*6+f"Templates: {tempchoice}")
-        print(" "*6+f"Optimizer: {optimizer}")
-        print()
 
-        ospec,isest=read_spec(fname,isest=isest,silence=True)
-        if tempchoice=="All SNe":
-            tempchoice="allsne"
-        tempdict=get_tempdict(tempchoice,uinptemp)
-        galdict=get_galdict(galpicks,uinpgal)
-
+        dfParams={}
+        dfParams['IO']={}
         parts=fname.split("/")
-        objname=parts[-1]
-        start=time.time()
-        output=duperfit(zstart,zstop,zstep,ospec,objname,tempdict,galdict,
-                        Avmin=Avmin,Avmax=Avmax,wsrc=wsrc,sclip=sclip,
-                        sigsrc=sigsrc,niter=niter,grow=grow,nsig=nsig,
-                        exactz=exactz,beginw=beginw,endw=endw,
-                        resolution=resolution,sfractol=sfractol,Rv=Rv,
-                        tscale=tscale,gscale=gscale,silence=True,save=False)
-        end=time.time()
-        print(f"Runtime: {end-start:.1f}s")
-        print("Top 10 matches:")
-        print(output[:10])
+        indir=""
+        for part in parts[:-1]:
+            indir+=part+"/"
+        dfParams['IO']['object_dir']=indir
+        dfParams['IO']['object_file']=fname.split("/")[-1]
+        dfParams['IO']['output_path']=os.getcwd()+"/"
+        dfParams['IO']['output_file']=outfile
+        dfParams['IO']['SN_templates']=tempchoice
+        dfParams['IO']['user_SN_template']=uinptemp
+        dfParams['IO']['gal_templates']=galpicks
+        dfParams['IO']['user_gal_template']=uinpgal
+
+        dfParams['fit_params']={}
+        dfParams['fit_params']['use_exact_z']=exactz
+        dfParams['fit_params']['z_min']=zstart
+        dfParams['fit_params']['z_max']=zstop
+        dfParams['fit_params']['delta_z']=zstep
+        dfParams['fit_params']['Av_min']=Avmin
+        dfParams['fit_params']['Av_max']=Avmax
+        dfParams['fit_params']['Rv']=3.1
+        dfParams['fit_params']['max_template_scale']=tscale
+        dfParams['fit_params']['max_galaxy_scale']=gscale
+
+        dfParams['fit_weight']={}
+        dfParams['fit_weight']['weight_source']=wsrc
+        dfParams['fit_weight']['estimate_error']=isest
+
+        dfParams['sigma_clipping']={}
+        dfParams['sigma_clipping']['sigma_clip']=sclip
+        dfParams['sigma_clipping']['sigma_source']=sigsrc
+        dfParams['sigma_clipping']['n_iterations']=niter
+        dfParams['sigma_clipping']['n_grow']=grow
+        dfParams['sigma_clipping']['n_sigma']=nsig
+
+        dfParams['wavelength_range']={}
+        dfParams['wavelength_range']['min_wavelength']=beginw
+        dfParams['wavelength_range']['max_wavelength']=endw
+        dfParams['wavelength_range']['wavelength_bin']=resolution
+        dfParams['wavelength_range']['minimum_wavelength_fraction']=sfractol
+
+        dfParams['options']={}
+        dfParams['options']['silence_messages']=True
+        dfParams['options']['save_output']=True
+        dfParams['options']['optimizer']=optimizer
+
+        mySupernova = Duperfit(dfParams)
+        mySupernova.fit(refit=True)
 
 def cancelfunc():
     """
