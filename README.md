@@ -28,7 +28,7 @@ This is the least user-friendly option, but the most flexible. The function with
 
 ### GUI
 
-This is being developed as the most user-friendly option, but may have the least flexibility. This has not been bug-tested since adding the environment variable, so do be warned if it presently does not run as expected.
+This is the most user-friendly option, but has the least flexibility. You may look at your chosen supernova spectrum by clicking the "Draw" button. Aside from some additional options -- i.e., estimating the included error spectrum by default or not -- the GUI currently follows the same work flow as that of Superfit. Additional options may be added in future development.
 
 ### Class/script
 
