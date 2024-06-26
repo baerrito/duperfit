@@ -361,6 +361,7 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 			`uw`		-->	Unweighted (1.0 at all points)
 			`tell`		-->	Telluric deweighted
 			`incl`		-->	Included
+            [filename]  --> Explicit path containing a user input weight file
 		sclip		:	Set True if ospec should be sigma clipped | bool,
 							default True
 		sigsrc		:	Source for values for sigma clipping | character,
@@ -446,6 +447,10 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		wgwav=wgspec[0]
 	elif wsrc=='uw':
 		weight=np.ones(len(ospec['wav']))
+	else:
+		wgspec=np.loadtxt(wsrc).T
+		weight=wgspec[1]
+		wgwav=wgspec[0]
 
 	# Clean up the spectrum, if called for
 	if sclip:
@@ -468,7 +473,7 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		maxw=ospec['wav'][-1]
 
 	# Bin the object spectrum to wavelength bounds
-	if wsrc=='tell':
+	if wsrc!='incl' or wsrc!='uw':
 		bospec = bin_spec_weighted(ospec,minw,maxw,resolution,weight,samewav=False,sigwav=wgwav)
 	else:
 		bospec = bin_spec_weighted(ospec,minw,maxw,resolution,weight)
@@ -529,7 +534,6 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		# Galaxy loop
 		for j,(gfile,gspec) in enumerate(zip(gfiles,gspecs)):
 			gname=gfile[gfile.rfind("/")+1:]
-			Gal[j,:]=gname
 
 			# Redshift loop
 			for k in range(nzs):
@@ -549,6 +553,7 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 				cc[j,k]=popt[0]
 				ff[j,k]=popt[1]
 				Av[j,k]=-2.5*popt[2]
+				Gal[j,k]=gname
 
 			# End of the redshift loop
 
