@@ -473,7 +473,7 @@ def duperfit(zmin,zmax,zstep,ospec,objname,temdict,galdict,Avmin=-2.0,Avmax=2.0,
 		maxw=ospec['wav'][-1]
 
 	# Bin the object spectrum to wavelength bounds
-	if wsrc!='incl' or wsrc!='uw':
+	if wsrc!='incl' and wsrc!='uw':
 		bospec = bin_spec_weighted(ospec,minw,maxw,resolution,weight,samewav=False,sigwav=wgwav)
 	else:
 		bospec = bin_spec_weighted(ospec,minw,maxw,resolution,weight)
