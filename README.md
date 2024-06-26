@@ -6,11 +6,11 @@ Spectral classification software, adapting Superfit by Dr. D. Andrew Howell into
 
 At present, Duperfit is only tested to work on Linux systems. Mac OS X and Windows testing to come down the road. Duperfit is written in Python 3.8.8, and utilizes the following packages:
 
- - Astropy 4.3.1
- - extinction 0.4.6
- - NumPy 1.21.5
- - PyDL 0.7.0
- - SciPy 1.7.3
+ - [Astropy]{https://www.astropy.org/} 4.3.1
+ - [extinction]{https://extinction.readthedocs.io/en/latest/} 0.4.6
+ - [NumPy]{https://numpy.org/} 1.21.5
+ - [PyDL]{https://pydl.readthedocs.io/en/0.7.0/} 0.7.0
+ - [SciPy]{https://scipy.org/} 1.7.3
 
 ## Installation
 
