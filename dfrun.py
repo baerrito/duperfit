@@ -11,13 +11,6 @@
 import os
 import sys
 import json
-
-# Custom packages (using environment variable so this script can be used anywhere)
-try:
-    dfdir=os.environ['DFDIR']
-except KeyError:
-    raise Exception("$DFDIR not recognized")
-sys.path.append(dfdir)
 from dfclass import Duperfit
 
 #####################################################################
@@ -40,5 +33,6 @@ if __name__ == '__main__':
         params=json.load(f)
 
     DF = Duperfit(params)
-    DF.fit()
-    DF.plot(0)
+    DF.fit(runRefit=True)
+    DF.plot(0,saveFigure=True)
+    DF.MIDscore(plotScores=True,evaluatedTypes=['SNIa','SNIb','SNIc','SNII','SNIIn','SLSN-I'])
