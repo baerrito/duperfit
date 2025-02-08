@@ -538,7 +538,7 @@ def runfunc():
         dfParams['options']['optimizer']=optimizer
 
         mySupernova = Duperfit(dfParams)
-        mySupernova.fit(refit=True)
+        mySupernova.fit(runRefit=True)
 
 def cancelfunc():
     """
