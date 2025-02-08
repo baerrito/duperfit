@@ -19,6 +19,7 @@ from temp_handling import *
 from duperfit import *
 # Plotting
 import matplotlib.pyplot as plt
+plt.rc('axes', labelsize=18)
 plt.rc('xtick', labelsize=14)
 plt.rc('ytick', labelsize=14)
 plt.rc('font', family='serif')
@@ -65,18 +66,36 @@ def get_cum_frac(scores, typa, typb, ord='pos'):
 
 class Duperfit():
 
-    def __init__(self,pars):
+    def __init__(self,inputParameters):
+        """
+        INPUT:
+            inputParameters :   Dictionary of parameters as defined in the README
+        """
 
-        odir=pars['IO']['object_dir']
-        ofile=pars['IO']['object_file']
+        odir=inputParameters['IO']['object_dir']
+        ofile=inputParameters['IO']['object_file']
         self.fname=odir+ofile
-        self.tempchoice=pars['IO']['SN_templates']
-        self.uinptemp=pars['IO']['user_SN_template']
-        self.galpicks=pars['IO']['gal_templates']
-        self.uinpgal=pars['IO']['user_gal_template']
-        self.output_path=pars['IO']['output_path']
-        self.outfile=pars['IO']['output_file']
+        self.tempchoice=inputParameters['IO']['SN_templates']
+        self.uinptemp=inputParameters['IO']['user_SN_template']
+        self.galpicks=inputParameters['IO']['gal_templates']
+        self.uinpgal=inputParameters['IO']['user_gal_template']
 
+        self.output_path=inputParameters['IO']['output_path']
+        # make the output path if it doesn't exist
+        if not os.path.exists(self.output_path):
+            os.mkdir(self.output_path)
+
+        self.outfile=inputParameters['IO']['output_file']
+        # make a default output file name if one isn't provided
+        if self.outfile=="":
+            self.outfile='sf_result_'
+            parts=ofile.split(".")
+            for part in parts[:-1]:
+                self.outfile+=part
+            self.outfile+='.dfo'
+        self.objname=self.outfile.replace(".dfo","")
+
+        # just some extra options for now
         if self.tempchoice=='User Input':
             if self.uinptemp=='':
                 raise ValueError('Provide a template file')
@@ -84,33 +103,38 @@ class Duperfit():
             if self.uinpgal=='':
                 raise ValueError('Provide a galaxy file')
 
-        self.exactz=pars['fit_params']['use_exact_z']
-        self.zstart=pars['fit_params']['z_min']
-        self.zstop=pars['fit_params']['z_max']
-        self.zstep=pars['fit_params']['delta_z']
-        self.Avmin=pars['fit_params']['Av_min']
-        self.Avmax=pars['fit_params']['Av_max']
-        self.Rv=pars['fit_params']['Rv']
-        self.tscale=pars['fit_params']['max_template_scale']
-        self.gscale=pars['fit_params']['max_galaxy_scale']
+        # fitting parameters
+        self.exactz=inputParameters['fit_params']['use_exact_z']
+        self.zstart=inputParameters['fit_params']['z_min']
+        self.zstop=inputParameters['fit_params']['z_max']
+        self.zstep=inputParameters['fit_params']['delta_z']
+        self.Avmin=inputParameters['fit_params']['Av_min']
+        self.Avmax=inputParameters['fit_params']['Av_max']
+        self.Rv=inputParameters['fit_params']['Rv']
+        self.tscale=inputParameters['fit_params']['max_template_scale']
+        self.gscale=inputParameters['fit_params']['max_galaxy_scale']
 
-        self.wsrc=pars['fit_weight']['weight_source']
-        self.isest=pars['fit_weight']['estimate_error']
+        # weight parameters
+        self.wsrc=inputParameters['fit_weight']['weight_source']
+        self.isest=inputParameters['fit_weight']['estimate_error']
 
-        self.sclip=pars['sigma_clipping']['sigma_clip']
-        self.sigsrc=pars['sigma_clipping']['sigma_source']
-        self.niter=pars['sigma_clipping']['n_iterations']
-        self.grow=pars['sigma_clipping']['n_grow']
-        self.nsig=pars['sigma_clipping']['n_sigma']
+        # sigma clipping options to clean the spectrum
+        self.sclip=inputParameters['sigma_clipping']['sigma_clip']
+        self.sigsrc=inputParameters['sigma_clipping']['sigma_source']
+        self.niter=inputParameters['sigma_clipping']['n_iterations']
+        self.grow=inputParameters['sigma_clipping']['n_grow']
+        self.nsig=inputParameters['sigma_clipping']['n_sigma']
 
-        self.beginw=pars['wavelength_range']['min_wavelength']
-        self.endw=pars['wavelength_range']['max_wavelength']
-        self.resolution=pars['wavelength_range']['wavelength_bin']
-        self.sfractol=pars['wavelength_range']['minimum_wavelength_fraction']
+        # fit bounds and restrictions
+        self.beginw=inputParameters['wavelength_range']['min_wavelength']
+        self.endw=inputParameters['wavelength_range']['max_wavelength']
+        self.resolution=inputParameters['wavelength_range']['wavelength_bin']
+        self.sfractol=inputParameters['wavelength_range']['minimum_wavelength_fraction']
 
-        self.silence=pars['options']['silence_messages']
-        self.save=pars['options']['save_output']
-        self.optimizer=pars['options']['optimizer']
+        # extra options
+        self.silence=inputParameters['options']['silence_messages']
+        self.save=inputParameters['options']['save_output']
+        self.optimizer=inputParameters['options']['optimizer']
 
         # Header
         print("*"*60)
@@ -123,7 +147,7 @@ class Duperfit():
         print("*"+" "*58+"*")
         print("*"+" "*4+"When using this program, please cite:"+" "*17+"*")
         print("*"+" "*9+"D.A. Howell et al (2005), ApJ, 634, 1190"+" "*9+"*")
-        print("*"+" "*9+"M.J. Baer (in Preparation)"+" "*23+"*")
+        print("*"+" "*9+"M.J. Baer (2024), Duperfit, v0.2.0, Zenodo"+" "*7+"*")
         print("*"+" "*58+"*")
         print("*"*60)
         # Parameters
@@ -158,14 +182,28 @@ class Duperfit():
         self.tempdict=get_tempdict(self.tempchoice,self.uinptemp)
         self.galdict=get_galdict(self.galpicks,self.uinpgal)
 
-    def fit(self, refit=False):
+    def fit(self, runRefit=False):
+        """
+        FUNCTION: fit
+        ****************************************************************************
+        Calls the main Duperfit function
+        ****************************************************************************
+        OPTIONAL INPUT:
+            runRefit    :   Flag for refitting | boolean, default False
+        ****************************************************************************
+        NOTES:
+            The function does not re-run the fit by default if you've changed your
+            parameters but keep the same output file name; make sure you've set 
+            runRefit to True if using the same output file name with new parameters
+        """
 
         # if not refitting and an old output exists, load it
-        if not refit:
+        if not runRefit:
             outfile=self.output_path+self.outfile
+            # NOTE: blind check for output file if not flagged for refitting
             if os.path.isfile(outfile):
-                parts=self.fname.split("/")
-                self.objname=parts[-1]
+                #parts=self.fname.split("/")
+                #self.objname=parts[-1]
                 print("Existing fit found!")
                 self.output=tasc.read(outfile,format='fixed_width')
                 print("Top 10 matches:")
@@ -176,7 +214,8 @@ class Duperfit():
         parts2=parts[-1].split(".")
         self.objname=''
         for part in parts2[:-1]:
-            self.objname+=part
+            self.objname+=part+"."
+        self.objname=self.objname[:-1]
         start=time.time()
         self.output=duperfit(self.zstart,self.zstop,self.zstep,self.ospec,self.objname,
                         self.tempdict,self.galdict,Avmin=self.Avmin,Avmax=self.Avmax,
@@ -188,16 +227,26 @@ class Duperfit():
                         silence=self.silence,save=self.save,
                         output_path=self.output_path,outfile=self.outfile)
         end=time.time()
-        print(f"Runtime: {end-start:.1f}s")
+        timeSeconds=end-start
+        timeMinutes=int(timeSeconds/60.)
+        timeHours=int(timeMinutes/60.)
+        print(f"Runtime: {timeHours:d}h {timeMinutes-timeHours*60:d}m {timeSeconds-timeMinutes*60.:.1f}s")
         print("Top 10 matches:")
         print(self.output[:10])
         return
 
-    def plot(self,iparam,sav=False):
+    def plot(self,tableRowIndex,saveFigure=False,lightMode=False,trimRange=False):
+
+        if lightMode:
+            bgcolor='w'
+            fgcolor='k'
+        else:
+            bgcolor='k'
+            fgcolor='w'
 
         try:
 
-            trow = self.output[iparam]
+            trow = self.output[tableRowIndex]
 
             for tfile, tspec in zip(self.tempdict['tfiles'],self.tempdict['tspecs']):
                 if trow['SN'] in tfile:
@@ -233,33 +282,43 @@ class Duperfit():
             C=trow['cSN'];D=trow['cgal'];A_V=trow['Av']
             norm = 1./np.median(self.ospec['flux'])
             fig=plt.figure(figsize=(20,10))
-            fig.set_facecolor('k')
-            fig.set_edgecolor('k')
+            fig.set_facecolor(bgcolor)
+            fig.set_edgecolor(bgcolor)
             ax=fig.add_subplot(111)
-            ax.set_facecolor('k')
-            wo=(self.ospec['wav']>=self.beginw)&(self.ospec['wav']<=self.endw)
-            ax.plot(self.ospec['wav'][wo],self.ospec['flux'][wo]*norm,'-w',
+            ax.set_facecolor(bgcolor)
+            if trimRange:
+                wo=(self.ospec['wav']>=self.beginw)&(self.ospec['wav']<=self.endw)
+            else:
+                wo=np.empty(len(self.ospec['wav']),dtype=bool)
+                wo[:]=True
+            ax.plot(self.ospec['wav'][wo],self.ospec['flux'][wo]*norm,ls='-',c=fgcolor,
                      drawstyle='steps-mid',label=self.objname)
-            wt=(Tmspec['wav']>=self.beginw)&(Tmspec['wav']<=self.endw)
+            if trimRange:
+                wt=(Tmspec['wav']>=self.beginw)&(Tmspec['wav']<=self.endw)
+            else:
+                wt=np.empty(len(Tmspec['wav']),dtype=bool)
+                wt[:]=True
             ax.plot(Tmspec['wav'][wt],modflux[wt],'-r',drawstyle='steps-mid',
                      label=temname+', '+galname+f', $C={C:.4f}$, $D={D:.4f}$'\
                      +f', $A_V={A_V:.4f}$')
             ax.text(self.ospec['wav'].max(),(self.ospec['flux']*norm).max(),
                      f'S={S:.3f}',fontsize=16)
-            ax.spines['bottom'].set_color('w')
-            ax.spines['top'].set_color('w')
-            ax.spines['left'].set_color('w')
-            ax.spines['right'].set_color('w')
-            ax.xaxis.label.set_color('w')
-            ax.tick_params(axis='x', colors='w')
-            ax.yaxis.label.set_color('w')
-            ax.tick_params(axis='y', colors='w')
-            ax.legend(shadow=True,fontsize=14,facecolor='k',labelcolor='w')
+            if not trimRange:
+                ax.axvspan(self.beginw,self.endw,color='gray',alpha=0.5)
+            ax.spines['bottom'].set_color(fgcolor)
+            ax.spines['top'].set_color(fgcolor)
+            ax.spines['left'].set_color(fgcolor)
+            ax.spines['right'].set_color(fgcolor)
+            ax.xaxis.label.set_color(fgcolor)
+            ax.tick_params(axis='x', colors=fgcolor)
+            ax.yaxis.label.set_color(fgcolor)
+            ax.tick_params(axis='y', colors=fgcolor)
+            ax.legend(shadow=True,fontsize=14,facecolor=bgcolor,labelcolor=fgcolor)
             ax.set_xlabel('Wavelength ($\\AA$)')
             ax.set_ylabel('Normalized F$_{\\lambda}$')
-            ax.grid(True, which='major', alpha=0.8, ls='-',color='w')
-            ax.grid(True, which='minor', alpha=0.4, ls='--',color='w')
-            if sav:
+            #ax.grid(True, which='major', alpha=0.8, ls='-',color='w')
+            #ax.grid(True, which='minor', alpha=0.4, ls='--',color='w')
+            if saveFigure:
                 plt.savefig(self.output_path+'df_plot_'+self.objname.replace(".dat","")+'.jpg')
             plt.show()
             return
@@ -269,8 +328,8 @@ class Duperfit():
             print("I don't have output to plot... use the fit function")
             return
 
-    def MIDscore(self,snphase=0.,evaltypes=['SNIa','SNIb','SNIc','SNII','SNIIn','SLSN-I','SLSN-II'],
-                 plot=False):
+    def MIDscore(self,supernovaPhase=0.,evaluatedTypes=['SNIa','SNIb','SNIc','SNII','SNIIn','SLSN-I','SLSN-II'],
+                 plotScores=False):
 
         try:
 
@@ -281,13 +340,13 @@ class Duperfit():
             iarrs={}
 
             Xscors=[];Yscors=[]
-            for itype in evaltypes:
+            for itype in evaluatedTypes:
                 Xarr.append(itype)
                 self.MIDs[itype]={}
                 wtyp1=wheretype(itype,SNlist,conIIn=True)
                 ii1=np.mean(wtyp1[:5])
                 iXscors=[];iYscors=[];iarrs[itype]=[]
-                for jtype in evaltypes:
+                for jtype in evaluatedTypes:
                     if jtype==itype:
                         iarrs[itype].append(0)
                         continue
@@ -303,25 +362,25 @@ class Duperfit():
             Xarr=np.array(Xarr)
 
             data=(Xarr,);names=('X',);dtype=('str',)
-            for itype in evaltypes:
+            for itype in evaluatedTypes:
                 data+=(iarrs[itype],)
                 names+=(itype,)
                 dtype+=('float',)
 
             self.scortab=Table(data,names=names,dtype=dtype)
-            for itype in evaltypes:
+            for itype in evaluatedTypes:
                 self.scortab[itype].info.format='.1f'
-            fname=self.objname+".midscore"
-            fname=fname.replace(".dat","")
+            fname=self.outfile+".midscore"
+            fname=fname.replace(".dfo","")
             tasc.write(self.scortab,self.output_path+fname,format='fixed_width',overwrite=True)
-            fname="MIDscore_"+self.objname+".tex"
-            fname=fname.replace(".dat","")
+            fname="MIDscore_"+self.outfile+".tex"
+            fname=fname.replace(".dfo","")
             tasc.write(self.scortab,self.output_path+fname,format='latex',overwrite=True)
 
 
             imn=np.argmin(Xscors);imx=np.argmax(Yscors)
             if imn==imx:
-                self.besttype=evaltypes[imx]
+                self.besttype=evaluatedTypes[imx]
             else:
                 self.besttype='ambiguous'
 
@@ -332,9 +391,9 @@ class Duperfit():
             print(' '*6+'However, you should check the scores to be sure.')
             print()
 
-            if plot:
+            if plotScores:
                 supscore = {}; ds = []; allkeys = set()
-                for type in evaltypes:
+                for type in evaluatedTypes:
                     fname = dfdir+f"/tempbank/score_eval/scores_{type}.pickle"
                     with open(fname, "rb") as f:
                         scores = pickle.load(f)
@@ -342,8 +401,8 @@ class Duperfit():
                     ds.append(scores)
                     supscore[f"for_{type}"] = scores
 
-                type1=evaltypes[imn]
-                type2=evaltypes.copy()
+                type1=evaluatedTypes[imn]
+                type2=evaluatedTypes.copy()
                 type2.remove(type1)
 
                 alltypes=['SNIa','SNIb','SNIc','SNII','SNIIn','SLSN-I','SLSN-II']
@@ -404,7 +463,7 @@ class Duperfit():
                         axs[ig,0].scatter(phaseb,scoreb,marker=marks[ll],\
                                         edgecolors=cols[ll],facecolors='none',\
                                         label=f'{ty}',linewidths=1.2,s=75)
-                        axs[ig,0].plot(snphase,snscore,marker='d',color='w',markersize=10)
+                        axs[ig,0].plot(supernovaPhase,snscore,marker='d',color='w',markersize=10)
                         axs[ig,0].set_ylabel(f"{type1}$-${ty}")
                         axs[ig,0].grid(True,which='major',ls='-',alpha=0.8,color='w')
                         axs[ig,0].grid(True,which='minor',ls='--',alpha=0.4,color='w')
@@ -436,6 +495,8 @@ class Duperfit():
                         axs[ig,1].yaxis.label.set_color('w')
                         axs[ig,1].tick_params(axis='y', colors='w')
                         axs[ig,1].legend(shadow=True,loc='upper left',fontsize=14,facecolor='k',labelcolor='w')
+                        axs[ig,0].set_yscale('symlog')
+                        axs[ig,1].set_yscale('symlog')
                         ig += 1
                     else:
                         axs[0].scatter(phasea, scorea, marker=mark1, edgecolors=col1, \
@@ -477,7 +538,7 @@ class Duperfit():
                 #print(fname)
                 #quit()
                 plt.savefig(self.output_path+fname,dpi=150)
-                #plt.show()
+                plt.show()
 
             return
 
