@@ -147,7 +147,7 @@ class Duperfit():
         print("*"+" "*58+"*")
         print("*"+" "*4+"When using this program, please cite:"+" "*17+"*")
         print("*"+" "*9+"D.A. Howell et al (2005), ApJ, 634, 1190"+" "*9+"*")
-        print("*"+" "*9+"M.J. Baer (2024), Duperfit, v0.2.0, Zenodo"+" "*7+"*")
+        print("*"+" "*9+"M.J. Baer (2024), Duperfit, v0.1.2, Zenodo"+" "*7+"*")
         print("*"+" "*58+"*")
         print("*"*60)
         # Parameters
