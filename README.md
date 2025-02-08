@@ -75,3 +75,7 @@ The Class and provided example script in `dfrun.py` utilize the same input struc
 Similarly to the GUI, many of these options are subject to changes in future development.
 
 Custom scripts may be written and saved into any directory on your machine, provided the path to the Duperfit installation directory is appended to your system path before any imports.
+
+#### MID Scoring
+
+One additional experimental feauture in Duperfit includes Mean-Index Difference (MID) Scoring, a scheme based on that described in [Quimby et al. (2018)](https://ui.adsabs.harvard.edu/abs/2018ApJ...855....2Q/abstract). The script `temp_midscore.py` will re-evaluate the scores for all templates based on the last full template library run, making new pickle files for scoring. Note that this will not provide a new baseline for new template libraries; to do that, one would have to run the fits as described in the Quimby et al. paper for all templates, old and new. The last full template library run took a full week with 8 cores running in parallel. For this reason, any future library updates for Duperfit may not be consistent with this feature straight away.
